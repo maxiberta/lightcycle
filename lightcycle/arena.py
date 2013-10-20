@@ -19,9 +19,9 @@ class LightCycleArena(object):
             player.color = i
             x = self.width * i / (len(self.players) + 1)
             y = self.height * i / (len(self.players) + 1)
-            self.move_player(player, x, y)
+            self.move(player, x, y)
 
-    def move_player(self, player, x, y):
+    def move(self, player, x, y):
         print player.name, '==>', x, y
         assert(player in self.players)
         assert(0 <= x < self.width)
@@ -42,6 +42,6 @@ class LightCycleArena(object):
                     print player.name, '==>', movement
                     x = player.x + DIRECTIONS[movement].x
                     y = player.y + DIRECTIONS[movement].y
-                    self.move_player(player, x, y)
+                    self.move(player, x, y)
         except:
             print 'CRASHED!', player.name
