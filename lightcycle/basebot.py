@@ -3,13 +3,13 @@
 from collections import namedtuple
 
 
-Point = namedtuple('Point', 'id x y')
+Point = namedtuple('Point', 'x y')
 
 DIRECTIONS = {
-    'N': Point('N', 0, -1),
-    'E': Point('E', 1, 0),
-    'S': Point('S', 0, 1),
-    'W': Point('W', -1, 0),
+    'N': Point(0, -1),
+    'E': Point(1, 0),
+    'S': Point(0, 1),
+    'W': Point(-1, 0),
 }
 
 
@@ -22,7 +22,7 @@ class LightCycleBaseBot(object):
 class LightCycleRandomBot(LightCycleBaseBot):
 
     def get_next_step(self, arena, x, y):
-        possible_directions = [direction.id for direction in DIRECTIONS.values()
+        possible_directions = [key for key, direction in DIRECTIONS.items()
                                if 0 <= x + direction.x < arena.shape[0]
                                and 0 <= y + direction.y < arena.shape[1]
                                and not arena[x + direction.x, y + direction.y]]
