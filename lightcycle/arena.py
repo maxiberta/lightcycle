@@ -3,6 +3,7 @@
 import numpy
 
 from .basebot import DIRECTIONS
+from .worker import RemoteInstance
 
 
 class LightCycleArena(object):
@@ -17,12 +18,13 @@ class LightCycleArena(object):
         self.arena = numpy.zeros(shape=(self.width, self.height), dtype=numpy.int8)
         for i, player in enumerate(self.players, 1):
             player.color = i
+            player._remote = RemoteInstance(player.bot)
             x = self.width * i / (len(self.players) + 1)
             y = self.height * i / (len(self.players) + 1)
             self.move(player, x, y)
 
     def move(self, player, x, y):
-        print player.name, '==>', x, y
+        #print player.name, '==>', x, y
         assert(player in self.players)
         assert(0 <= x < self.width)
         assert(0 <= y < self.height)
@@ -38,10 +40,15 @@ class LightCycleArena(object):
             for step in xrange(self.width * self.height):
                 for player in self.players:
                     arena_snapshot = self.arena.copy()
-                    movement = player.bot.get_next_step(arena_snapshot, player.x, player.y)  # TODO add timeout!
-                    print player.name, '==>', movement
+                    movement = player._remote.get_next_step(arena_snapshot, player.x, player.y)  # TODO add timeout!
+                    #print player.name, '==>', movement
                     x = player.x + DIRECTIONS[movement].x
                     y = player.y + DIRECTIONS[movement].y
                     self.move(player, x, y)
+        except RemoteInstance.Timeout:
+            print 'TIME UP!',player.name
         except:
             print 'CRASHED!', player.name
+        finally:
+            for player in self.players:
+                player._remote.terminate()
