@@ -18,7 +18,7 @@ class LightCycleArena(object):
         self.arena = numpy.zeros(shape=(self.width, self.height), dtype=numpy.int8)
         for i, player in enumerate(self.players, 1):
             player.color = i
-            player._remote = RemoteInstance(player.bot)
+            player._remote = RemoteInstance(player.bot, timeout=.1)
             x = self.width * i / (len(self.players) + 1)
             y = self.height * i / (len(self.players) + 1)
             self.move(player, x, y)
@@ -40,7 +40,7 @@ class LightCycleArena(object):
             for step in xrange(self.width * self.height):
                 for player in self.players:
                     arena_snapshot = self.arena.copy()
-                    movement = player._remote.get_next_step(arena_snapshot, player.x, player.y)  # TODO add timeout!
+                    movement = player._remote.get_next_step(arena_snapshot, player.x, player.y)
                     #print player.name, '==>', movement
                     x = player.x + DIRECTIONS[movement].x
                     y = player.y + DIRECTIONS[movement].y

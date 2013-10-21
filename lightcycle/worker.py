@@ -8,12 +8,12 @@ class RemoteInstance(object):
 
     class Timeout(Exception): pass
 
-    def __init__(self, klass, *args, **kwargs):
+    def __init__(self, klass, timeout=.1, *args, **kwargs):
+        self.timeout = timeout
         self.qin = Queue()
         self.qout = Queue()
         self.proc = Process(target=self.worker(klass, self.qout, self.qin) )
         self.proc.start()
-
 
     def __getattr__(self, name):
         def caller(*args, **kwargs):
@@ -21,7 +21,7 @@ class RemoteInstance(object):
                 try:
                     #print current_process(), 'Calling %s(...)' % name
                     self.qout.put([name, args, kwargs])
-                    result = self.qin.get(timeout=.1)
+                    result = self.qin.get(timeout=self.timeout)
                     #print current_process(),'RECEIVED:',result
                     return result
                 except Empty:
