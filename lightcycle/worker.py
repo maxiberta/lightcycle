@@ -8,6 +8,8 @@ class RemoteInstance(object):
 
     class Timeout(Exception): pass
 
+    class InvalidOutput(Exception): pass
+
     def __init__(self, klass, timeout=.1, *args, **kwargs):
         self.timeout = timeout
         self.qin = Queue()
@@ -46,8 +48,3 @@ class RemoteInstance(object):
 
     def terminate(self):
         self.proc.terminate()
-
-
-class RemoteDummy(object):
-    def sum(self, x, y):
-        return x+y

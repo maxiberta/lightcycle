@@ -29,13 +29,3 @@ class LightCycleRandomBot(LightCycleBaseBot):
                                and not arena[x + direction.x, y + direction.y]]
         #print possible_directions
         return random.choice(possible_directions or DIRECTIONS.keys())
-
-
-class LightCycleRandomDelay(LightCycleRandomBot):
-
-    def get_next_step(self, arena, x, y):
-        import time
-        secs = random.randrange(105)/1000.
-        #print 'Sleeping for %f secs' % secs
-        time.sleep(secs)
-        return super(LightCycleRandomDelay, self).get_next_step(arena, x, y)
