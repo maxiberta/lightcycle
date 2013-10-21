@@ -38,7 +38,7 @@ class LightCycleArena(object):
         player.x = x
         player.y = y
         self.arena[player.x, player.y] = player.color
-        self.match.log(player, player.x, player.y)
+        self.match.log(player, player.x, player.y, direction)
         print self.arena.T
         print
 
@@ -71,7 +71,8 @@ class LightCycleArena(object):
                         print 'CRASHED!', player.name, player.x, player.y
                         self.match.lost(player, u'Crashed')
         finally:
-            print self.match.__json__()
+            import json
+            print json.dumps(self.match.__json__())
             for player in self.players:
                 player._remote.terminate()
             return self.match.__json__()
