@@ -13,7 +13,7 @@ class TestArena(unittest.TestCase):
         self.player1 = Player('Player 1', LightCycleRandomBot)
         self.player2 = Player('Player 2', LightCycleRandomBot)
         self.width = 30
-        self.height = 20
+        self.height = 30
 
     def test_regular_match(self):
         match = LightCycleArena((self.player1, self.player2), self.width, self.height).start()
@@ -50,7 +50,16 @@ class TestArena(unittest.TestCase):
         self.assertEqual(match['result']['winner'], self.player1.name)
         self.assertEqual(match['result']['lost'], [{player3.name: 'Timeout'}], 'Player 3 should timeout on move')
 
-    def test_bot_crash(self):
+    def test_bot_crash_on_init(self):
+        class BrokenLightCycle(LightCycleRandomBot):
+            def __init__(self, *args, **kwargs):
+                return 1/0
+        player3 = Player('Player 3', BrokenLightCycle)
+        match = LightCycleArena((self.player1, player3), self.width, self.height).start()
+        self.assertEqual(match['result']['winner'], self.player1.name)
+        self.assertEqual(match['result']['lost'], [{player3.name: 'Timeout'}], 'Player 3 should timeout due to a crash')
+
+    def test_bot_crash_on_move(self):
         class BrokenLightCycle(LightCycleRandomBot):
             def get_next_step(self, arena, x, y):
                 return 1/0
