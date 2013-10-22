@@ -28,6 +28,18 @@ class TestArena(unittest.TestCase):
         match = LightCycleArena((player3, player4), self.width, self.height).start()
         self.assertEqual(match['result']['lost'].values(), ['Crashed'], 'The loser should have crashed')
 
+    def test_bots_crashing_on_each_other(self):
+        class EastBot(LightCycleBaseBot):
+            def get_next_step(self, *args, **kwargs):
+                return 'E'
+        class WestBot(LightCycleBaseBot):
+            def get_next_step(self, *args, **kwargs):
+                return 'W'
+        player3 = Player('Player 3', EastBot)
+        player4 = Player('Player 4', WestBot)
+        match = LightCycleArena((player3, player4), self.width, 1).start()
+        self.assertEqual(len(match['result']['lost']), 2)
+
     def test_invalid_move(self):
         class InvalidMoveBot(LightCycleBaseBot):
             def get_next_step(self, *args, **kwargs):
