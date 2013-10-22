@@ -56,7 +56,7 @@ class LightCycleArena(object):
                 for player in self.players:
                     arena_snapshot = self.arena.copy()
                     try:
-                        movement = player._botproxy.get_next_step(arena_snapshot, player.x, player.y)
+                        movement = player._botproxy.get_next_step(arena_snapshot, player.x, player.y, player.direction)
                         if movement not in DIRECTIONS:
                             raise RemoteInstance.InvalidOutput()
                         #print player.name, '==>', movement

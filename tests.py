@@ -21,7 +21,7 @@ class TestArena(unittest.TestCase):
 
     def test_string_bot_class(self):
         botsrc = ('''class LightCycleRandomBot(LightCycleBaseBot):\n'''
-                  '''    def get_next_step(self, arena, x, y):\n'''
+                  '''    def get_next_step(self, *args, **kwargs):\n'''
                   '''        return "N"''')
         player3 = Player('Player 3', botsrc)
         player4 = Player('Player 4', botsrc)
@@ -63,9 +63,9 @@ class TestArena(unittest.TestCase):
     def test_timeout_on_move(self):
         import time
         class LightCycleDelay(LightCycleRandomBot):
-            def get_next_step(self, arena, x, y):
+            def get_next_step(self, *args, **kwargs):
                 time.sleep(10)
-                return super(LightCycleDelay, self).get_next_step(arena, x, y)
+                return super(LightCycleDelay, self).get_next_step(*args, **kwargs)
         player3 = Player('Player 3', LightCycleDelay)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
         self.assertEqual(match['result']['winner'], self.player1.name)
@@ -82,7 +82,7 @@ class TestArena(unittest.TestCase):
 
     def test_bot_crash_on_move(self):
         class BrokenLightCycle(LightCycleRandomBot):
-            def get_next_step(self, arena, x, y):
+            def get_next_step(self, *args, **kwargs):
                 return 1/0
         player3 = Player('Player 3', BrokenLightCycle)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
@@ -91,7 +91,7 @@ class TestArena(unittest.TestCase):
 
     def test_multiple_crashes(self):
         class BrokenLightCycle(LightCycleRandomBot):
-            def get_next_step(self, arena, x, y):
+            def get_next_step(self, *args, **kwargs):
                 return 1/0
         player3 = Player('Player 3', BrokenLightCycle)
         player4 = Player('Player 4', BrokenLightCycle)

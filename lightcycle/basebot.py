@@ -16,16 +16,19 @@ DIRECTIONS = {
 
 class LightCycleBaseBot(object):
 
-    def get_next_step(self, arena, x, y):
+    def get_next_step(self, arena, x, y, direction):
         raise NotImplementedError('Should return one Direction.')
 
 
 class LightCycleRandomBot(LightCycleBaseBot):
 
-    def get_next_step(self, arena, x, y):
-        possible_directions = [key for key, direction in DIRECTIONS.items()
-                               if 0 <= x + direction.x < arena.shape[0]
-                               and 0 <= y + direction.y < arena.shape[1]
-                               and not arena[x + direction.x, y + direction.y]]
+    def get_next_step(self, arena, x, y, direction):
+        possible_movements = [key for key, value in DIRECTIONS.items()
+                               if 0 <= x + value.x < arena.shape[0]
+                               and 0 <= y + value.y < arena.shape[1]
+                               and not arena[x + value.x, y + value.y]]
         #print possible_directions
-        return random.choice(possible_directions or DIRECTIONS.keys())
+        if direction in possible_movements:
+            return direction
+        else:
+            return random.choice(possible_movements or DIRECTIONS.keys())
