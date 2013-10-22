@@ -34,13 +34,13 @@ class LightCycleArena(object):
         assert(player in self.players)
         assert(0 <= x < self.width)
         assert(0 <= y < self.height)
-        assert(not self.arena[x, y])
-        player.x = x
-        player.y = y
+        player.x, player.y, player.direction = x, y, direction
+        occupied = not self.arena[x, y]
         self.arena[player.x, player.y] = player.color
         self.match.log(player, player.x, player.y, direction)
         print self.arena.T
         print
+        assert(occupied)
 
     def start(self):
         try:
