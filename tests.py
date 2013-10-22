@@ -12,12 +12,21 @@ class TestArena(unittest.TestCase):
     def setUp(self):
         self.player1 = Player('Player 1', LightCycleRandomBot)
         self.player2 = Player('Player 2', LightCycleRandomBot)
-        self.width = 30
-        self.height = 30
+        self.width = 20
+        self.height = 20
 
     def test_regular_match(self):
         match = LightCycleArena((self.player1, self.player2), self.width, self.height).start()
-        self.assertEqual(match['result']['lost'][0].values(), ['Crashed'], 'The loser should have crashed')
+        self.assertEqual(match['result']['lost'].values(), ['Crashed'], 'The loser should have crashed')
+
+    def test_string_bot_class(self):
+        botsrc = ('''class LightCycleRandomBot(LightCycleBaseBot):\n'''
+                  '''    def get_next_step(self, arena, x, y):\n'''
+                  '''        return "N"''')
+        player3 = Player('Player 3', botsrc)
+        player4 = Player('Player 4', botsrc)
+        match = LightCycleArena((player3, player4), self.width, self.height).start()
+        self.assertEqual(match['result']['lost'].values(), ['Crashed'], 'The loser should have crashed')
 
     def test_invalid_move(self):
         class InvalidMoveBot(LightCycleBaseBot):
@@ -26,7 +35,7 @@ class TestArena(unittest.TestCase):
         player3 = Player('Player 3', InvalidMoveBot)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
         self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], [{player3.name: 'Invalid output'}], 'Player 3 should return invalid output')
+        self.assertEqual(match['result']['lost'], {player3.name: 'Invalid output'}, 'Player 3 should return invalid output')
 
     def test_timeout_on_instantiation(self):
         import time
@@ -37,7 +46,7 @@ class TestArena(unittest.TestCase):
         player3 = Player('Player 3', LightCycleDelay)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
         self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], [{player3.name: 'Timeout'}], 'Player 3 should timeout on instantiation')
+        self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should timeout on instantiation')
 
     def test_timeout_on_move(self):
         import time
@@ -48,7 +57,7 @@ class TestArena(unittest.TestCase):
         player3 = Player('Player 3', LightCycleDelay)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
         self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], [{player3.name: 'Timeout'}], 'Player 3 should timeout on move')
+        self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should timeout on move')
 
     def test_bot_crash_on_init(self):
         class BrokenLightCycle(LightCycleRandomBot):
@@ -57,7 +66,7 @@ class TestArena(unittest.TestCase):
         player3 = Player('Player 3', BrokenLightCycle)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
         self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], [{player3.name: 'Timeout'}], 'Player 3 should timeout due to a crash')
+        self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should timeout due to a crash')
 
     def test_bot_crash_on_move(self):
         class BrokenLightCycle(LightCycleRandomBot):
@@ -66,4 +75,16 @@ class TestArena(unittest.TestCase):
         player3 = Player('Player 3', BrokenLightCycle)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
         self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], [{player3.name: 'Timeout'}], 'Player 3 should timeout due to a crash')
+        self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should timeout due to a crash')
+
+    def test_multiple_crashes(self):
+        class BrokenLightCycle(LightCycleRandomBot):
+            def get_next_step(self, arena, x, y):
+                return 1/0
+        player3 = Player('Player 3', BrokenLightCycle)
+        player4 = Player('Player 4', BrokenLightCycle)
+        match = LightCycleArena((player3, player4), self.width, self.height).start()
+        self.assertNotIn('winner', match['result'])
+        self.assertEqual(match['result']['lost'],
+                         {player3.name: 'Timeout', player4.name: 'Timeout'},
+                         'Players 3 and 4 should both timeout simultaneously due to a crash')

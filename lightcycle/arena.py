@@ -2,7 +2,7 @@
 
 import numpy
 
-from .basebot import DIRECTIONS
+from .basebot import DIRECTIONS, LightCycleBaseBot
 from .worker import RemoteInstance
 
 
@@ -24,7 +24,7 @@ class LightCycleArena(object):
         for i, player in enumerate(self.players, 1):
             player.color = i
             player.status = self.PLAYING
-            player._remote = RemoteInstance(player.bot, timeout=.1)
+            player._botproxy = RemoteInstance(player.bot, timeout=.1, namespace={'LightCycleBaseBot':LightCycleBaseBot})
             x = self.width * i / (len(self.players) + 1)
             y = self.height * i / (len(self.players) + 1)
             self.move(player, x, y)
@@ -48,13 +48,15 @@ class LightCycleArena(object):
                 playing = [player for player in self.players
                                     if player.status == self.PLAYING]
                 # Check if there's just one player playing. That's the winner!
-                if len(playing) <= 1:
+                if len(playing) == 0:
+                    break  # A tie... Everybody loses :-(
+                if len(playing) == 1:
                     self.match.winner(playing[0])
-                    break
+                    break  # There's one winner!! :-D
                 for player in self.players:
                     arena_snapshot = self.arena.copy()
                     try:
-                        movement = player._remote.get_next_step(arena_snapshot, player.x, player.y)
+                        movement = player._botproxy.get_next_step(arena_snapshot, player.x, player.y)
                         if movement not in DIRECTIONS:
                             raise RemoteInstance.InvalidOutput()
                         #print player.name, '==>', movement
@@ -74,7 +76,7 @@ class LightCycleArena(object):
             import json
             print json.dumps(self.match.__json__())
             for player in self.players:
-                player._remote.terminate()
+                player._botproxy.terminate()
             return self.match.__json__()
 
 
@@ -102,8 +104,8 @@ class LightCycleMatch(object):
     def lost(self, player, cause):
         player.status = LightCycleArena.LOST
         if 'lost' not in self.result:
-            self.result['lost'] = []
-        self.result['lost'].append({player.name: cause})
+            self.result['lost'] = {}
+        self.result['lost'][player.name] = cause
 
     def __json__(self):
         data = dict(
