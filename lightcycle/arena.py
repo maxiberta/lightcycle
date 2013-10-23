@@ -1,5 +1,6 @@
 # encoding=utf-8
 
+import time
 import numpy
 
 from .basebot import DIRECTIONS, LightCycleBaseBot
@@ -73,6 +74,7 @@ class LightCycleArena(object):
                         print 'CRASHED!', player.name, player.x, player.y
                         self.match.lost(player, u'Crashed')
         finally:
+            self.match.end()
             import json
             print json.dumps(self.match.__json__())
             for player in self.players:
@@ -88,6 +90,7 @@ class LightCycleMatch(object):
         self.players = players
         self.moves = []
         self.result = {}
+        self.start_time = time.time()
 
     def log(self, player, x, y, direction=None):
         self.moves.append(dict(
@@ -107,6 +110,9 @@ class LightCycleMatch(object):
             self.result['lost'] = {}
         self.result['lost'][player.name] = cause
 
+    def end(self):
+        self.end_time = time.time()
+
     def __json__(self):
         data = dict(
                 width=self.width,
@@ -114,5 +120,6 @@ class LightCycleMatch(object):
                 players=[player.name for player in self.players],
                 moves=self.moves,
                 result=self.result,
+                elapsed=self.end_time - self.start_time,
                 )
         return data
