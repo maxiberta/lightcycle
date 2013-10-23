@@ -1,5 +1,6 @@
 # encoding=utf-8
 
+from lightcycle.security import seal
 from multiprocessing import Process, Queue, current_process
 from Queue import Empty
 import inspect
@@ -37,6 +38,7 @@ class RemoteInstance(object):
 
     @staticmethod
     def worker(klass, input, output, namespace=None, class_validator=None):
+            seal() # seal the running environment, EXTERMINATE! EXTERMINATE sys!
             if isinstance(klass, basestring):  # Received a string of code
                 if class_validator is None:
                     class_validator = lambda x: True

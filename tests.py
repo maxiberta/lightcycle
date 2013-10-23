@@ -5,7 +5,7 @@ import unittest
 from lightcycle.arena import LightCycleArena
 from lightcycle.basebot import LightCycleBaseBot, LightCycleRandomBot
 from lightcycle.player import Player
-
+from lightcycle.security import blacklisted_modules, seal
 
 class TestArena(unittest.TestCase):
 
@@ -17,6 +17,8 @@ class TestArena(unittest.TestCase):
 
     def test_regular_match(self):
         match = LightCycleArena((self.player1, self.player2), self.width, self.height).start()
+        # Ojo que si los dos crashean, el test da un error que no deberia (EMPATE)
+        self.assertIn('winner', match['result'], 'There should be a winner')
         self.assertEqual(match['result']['lost'].values(), ['Crashed'], 'The loser should have crashed')
 
     def test_string_bot_class(self):
@@ -47,6 +49,7 @@ class TestArena(unittest.TestCase):
         player4 = Player('Player 4', WestBot)
         match = LightCycleArena((player3, player4), self.width, 1).start()
         self.assertEqual(len(match['result']['lost']), 2)
+        self.assertNotIn('winner', match['result'])
 
     def test_invalid_move(self):
         class InvalidMoveBot(LightCycleBaseBot):
@@ -97,7 +100,7 @@ class TestArena(unittest.TestCase):
         self.assertEqual(match['result']['winner'], self.player1.name)
         self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should timeout due to a crash')
 
-    def test_multiple_crashes(self):
+    def test_tie(self):
         class BrokenLightCycle(LightCycleRandomBot):
             def get_next_step(self, *args, **kwargs):
                 return 1/0
@@ -107,4 +110,17 @@ class TestArena(unittest.TestCase):
         self.assertNotIn('winner', match['result'])
         self.assertEqual(match['result']['lost'],
                          {player3.name: 'Timeout', player4.name: 'Timeout'},
-                         'Players 3 and 4 should both timeout simultaneously due to a crash')
+                         'Players 3 and 4 should both timeout simultaneously due to a crash (it was a tie)')
+
+    def test_attacks(self):
+        import random
+        m = random.choice(blacklisted_modules)
+        botsrc = ('''class LightCycleRandomBot(LightCycleBaseBot):\n'''
+                  '''    def get_next_step(self, *args, **kwargs):\n'''
+                  '''        import %s;return "N"''' % m)
+        player3 = Player('Player 3', botsrc)
+        player4 = Player('Player 4', botsrc)
+        match = LightCycleArena((player3, player4), self.width, self.height).start()
+        self.assertEqual(match['result']['lost'],
+                         {player3.name: 'Timeout', player4.name: 'Timeout'},
+                         'Players 3 and 4 should both timeout simultaneously due to an invalid import')
