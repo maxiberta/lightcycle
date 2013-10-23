@@ -5,7 +5,7 @@ import unittest
 from lightcycle.arena import LightCycleArena
 from lightcycle.basebot import LightCycleBaseBot, LightCycleRandomBot
 from lightcycle.player import Player
-from lightcycle.security import blacklisted_modules, seal
+from lightcycle.security import blacklisted_modules
 
 class TestArena(unittest.TestCase):
 
