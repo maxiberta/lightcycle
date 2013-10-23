@@ -25,7 +25,10 @@ class LightCycleArena(object):
         for i, player in enumerate(self.players, 1):
             player.color = i
             player.status = self.PLAYING
-            player._botproxy = RemoteInstance(player.bot, timeout=.02, namespace={'LightCycleBaseBot':LightCycleBaseBot})
+            player._botproxy = RemoteInstance(player.bot, timeout=.02,
+                    namespace={'LightCycleBaseBot':LightCycleBaseBot},
+                    validator=lambda x: issubclass(x, LightCycleBaseBot)
+                    )
             x = self.width * i / (len(self.players) + 1)
             y = self.height * i / (len(self.players) + 1)
             self.move(player, x, y)

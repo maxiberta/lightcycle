@@ -28,6 +28,14 @@ class TestArena(unittest.TestCase):
         match = LightCycleArena((player3, player4), self.width, self.height).start()
         self.assertEqual(match['result']['lost'].values(), ['Crashed'], 'The loser should have crashed')
 
+    def test_invalid_bot_inheritance(self):
+        class InvalidBot(object):
+            pass
+        player3 = Player('Player 3', InvalidBot)
+        match = LightCycleArena((self.player1, player3), self.width, self.height).start()
+        self.assertEqual(match['result']['winner'], self.player1.name)
+        self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should return invalid output')
+
     def test_bots_crashing_on_each_other(self):
         class EastBot(LightCycleBaseBot):
             def get_next_step(self, *args, **kwargs):

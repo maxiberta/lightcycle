@@ -11,11 +11,11 @@ class RemoteInstance(object):
 
     class InvalidOutput(Exception): pass
 
-    def __init__(self, klass, timeout=.1, namespace=None, *args, **kwargs):
+    def __init__(self, klass, timeout=.1, namespace=None, validator=None, *args, **kwargs):
         self.timeout = timeout
         self.qin = Queue()
         self.qout = Queue()
-        self.proc = Process(target=self.worker, args=(klass, self.qout, self.qin, namespace))
+        self.proc = Process(target=self.worker, args=(klass, self.qout, self.qin, namespace, validator))
         self.proc.start()
 
     def __getattr__(self, name):
@@ -36,12 +36,15 @@ class RemoteInstance(object):
         return wrapper
 
     @staticmethod
-    def worker(klass, input, output, namespace=None):
+    def worker(klass, input, output, namespace=None, class_validator=None):
             if isinstance(klass, basestring):  # Received a string of code
+                if class_validator is None:
+                    class_validator = lambda x: True
                 namespace = namespace or {}
                 exec klass in namespace
                 # Find the first class declared in our custom namespace
                 klass = [var for var in namespace.values() if inspect.isclass(var)][0]
+            assert(class_validator(klass))
             print current_process(), 'Instancing %s' % klass
             instance = klass()
             for method, args, kwargs in iter(input.get, 'STOP'):
