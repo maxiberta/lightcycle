@@ -34,7 +34,7 @@ class LightCycleArena(object):
             self.move(player, x, y)
 
     def move(self, player, x, y, direction=None):
-        #print player.name, '==>', x, y
+        #print player.username, '==>', x, y
         assert(player in self.players)
         assert(0 <= x < self.width)
         assert(0 <= y < self.height)
@@ -63,23 +63,23 @@ class LightCycleArena(object):
                         movement = player._botproxy.get_next_step(arena_snapshot, player.x, player.y, player.direction)
                         if movement not in DIRECTIONS:
                             raise RemoteInstance.InvalidOutput()
-                        #print player.name, '==>', movement
+                        #print player.username, '==>', movement
                         x = player.x + DIRECTIONS[movement].x
                         y = player.y + DIRECTIONS[movement].y
                         self.move(player, x, y, movement)
                     except RemoteInstance.InvalidOutput:
-                        print 'Invalid output!', player.name, movement
+                        print 'Invalid output!', player.username, movement
                         self.match.lost(player, u'Invalid output')
                     except RemoteInstance.Timeout:
-                        print 'TIME UP!', player.name
+                        print 'TIME UP!', player.username
                         self.match.lost(player, u'Timeout')
                     except:
-                        print 'CRASHED!', player.name, player.x, player.y
+                        print 'CRASHED!', player.username, player.x, player.y
                         self.match.lost(player, u'Crashed')
         finally:
             self.match.end()
-            import json
-            print json.dumps(self.match.__json__())
+            #import json
+            #print json.dumps(self.match.__json__())
             for player in self.players:
                 player._botproxy.terminate()
             return self.match.__json__()
@@ -97,7 +97,7 @@ class LightCycleMatch(object):
 
     def log(self, player, x, y, direction=None):
         self.moves.append(dict(
-            player=player.name,
+            player=player.username,
             x=x,
             y=y,
             direction=direction,
@@ -105,13 +105,13 @@ class LightCycleMatch(object):
 
     def winner(self, player):
         player.status = LightCycleArena.WINNER
-        self.result['winner'] = player.name
+        self.result['winner'] = player.username
 
     def lost(self, player, cause):
         player.status = LightCycleArena.LOST
         if 'lost' not in self.result:
             self.result['lost'] = {}
-        self.result['lost'][player.name] = cause
+        self.result['lost'][player.username] = cause
 
     def end(self):
         self.end_time = time.time()
@@ -120,7 +120,7 @@ class LightCycleMatch(object):
         data = dict(
                 width=self.width,
                 height=self.height,
-                players=[player.name for player in self.players],
+                players=[player.username for player in self.players],
                 moves=self.moves,
                 result=self.result,
                 elapsed=self.end_time - self.start_time,
