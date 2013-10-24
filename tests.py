@@ -35,8 +35,8 @@ class TestArena(unittest.TestCase):
             pass
         player3 = Player('Player 3', InvalidBot)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
-        self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should return invalid output')
+        self.assertEqual(match['result']['winner'], self.player1.username)
+        self.assertEqual(match['result']['lost'], {player3.username: 'Timeout'}, 'Player 3 should return invalid output')
 
     def test_bots_crashing_on_each_other(self):
         class EastBot(LightCycleBaseBot):
@@ -57,8 +57,8 @@ class TestArena(unittest.TestCase):
                 return 'The 3rd dimension!'
         player3 = Player('Player 3', InvalidMoveBot)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
-        self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], {player3.name: 'Invalid output'}, 'Player 3 should return invalid output')
+        self.assertEqual(match['result']['winner'], self.player1.username)
+        self.assertEqual(match['result']['lost'], {player3.username: 'Invalid output'}, 'Player 3 should return invalid output')
 
     def test_timeout_on_instantiation(self):
         import time
@@ -68,8 +68,8 @@ class TestArena(unittest.TestCase):
                 super(LightCycleDelay, self).__init__(*args, **kwargs)
         player3 = Player('Player 3', LightCycleDelay)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
-        self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should timeout on instantiation')
+        self.assertEqual(match['result']['winner'], self.player1.username)
+        self.assertEqual(match['result']['lost'], {player3.username: 'Timeout'}, 'Player 3 should timeout on instantiation')
 
     def test_timeout_on_move(self):
         import time
@@ -79,8 +79,8 @@ class TestArena(unittest.TestCase):
                 return super(LightCycleDelay, self).get_next_step(*args, **kwargs)
         player3 = Player('Player 3', LightCycleDelay)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
-        self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should timeout on move')
+        self.assertEqual(match['result']['winner'], self.player1.username)
+        self.assertEqual(match['result']['lost'], {player3.username: 'Timeout'}, 'Player 3 should timeout on move')
 
     def test_bot_crash_on_init(self):
         class BrokenLightCycle(LightCycleRandomBot):
@@ -88,8 +88,8 @@ class TestArena(unittest.TestCase):
                 return 1/0
         player3 = Player('Player 3', BrokenLightCycle)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
-        self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should timeout due to a crash')
+        self.assertEqual(match['result']['winner'], self.player1.username)
+        self.assertEqual(match['result']['lost'], {player3.username: 'Timeout'}, 'Player 3 should timeout due to a crash')
 
     def test_bot_crash_on_move(self):
         class BrokenLightCycle(LightCycleRandomBot):
@@ -97,8 +97,8 @@ class TestArena(unittest.TestCase):
                 return 1/0
         player3 = Player('Player 3', BrokenLightCycle)
         match = LightCycleArena((self.player1, player3), self.width, self.height).start()
-        self.assertEqual(match['result']['winner'], self.player1.name)
-        self.assertEqual(match['result']['lost'], {player3.name: 'Timeout'}, 'Player 3 should timeout due to a crash')
+        self.assertEqual(match['result']['winner'], self.player1.username)
+        self.assertEqual(match['result']['lost'], {player3.username: 'Timeout'}, 'Player 3 should timeout due to a crash')
 
     def test_tie(self):
         class BrokenLightCycle(LightCycleRandomBot):
@@ -109,7 +109,7 @@ class TestArena(unittest.TestCase):
         match = LightCycleArena((player3, player4), self.width, self.height).start()
         self.assertNotIn('winner', match['result'])
         self.assertEqual(match['result']['lost'],
-                         {player3.name: 'Timeout', player4.name: 'Timeout'},
+                         {player3.username: 'Timeout', player4.username: 'Timeout'},
                          'Players 3 and 4 should both timeout simultaneously due to a crash (it was a tie)')
 
     def test_attacks(self):
@@ -122,5 +122,5 @@ class TestArena(unittest.TestCase):
         player4 = Player('Player 4', botsrc)
         match = LightCycleArena((player3, player4), self.width, self.height).start()
         self.assertEqual(match['result']['lost'],
-                         {player3.name: 'Timeout', player4.name: 'Timeout'},
+                         {player3.username: 'Timeout', player4.username: 'Timeout'},
                          'Players 3 and 4 should both timeout simultaneously due to an invalid import')
