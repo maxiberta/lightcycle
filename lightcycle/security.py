@@ -25,5 +25,5 @@ def seal():
     for m in blacklisted_modules:
         #print "unsetting ", m
         sys.modules[m] = None
-        
+
     open = None

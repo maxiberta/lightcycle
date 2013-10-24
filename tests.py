@@ -12,8 +12,8 @@ class TestArena(unittest.TestCase):
     def setUp(self):
         self.player1 = Player('Player 1', LightCycleRandomBot)
         self.player2 = Player('Player 2', LightCycleRandomBot)
-        self.width = 20
-        self.height = 20
+        self.width = 10
+        self.height = 10
 
     def test_regular_match(self):
         match = LightCycleArena((self.player1, self.player2), self.width, self.height).start()

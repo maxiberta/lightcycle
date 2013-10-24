@@ -78,8 +78,8 @@ class LightCycleArena(object):
                         self.match.lost(player, u'Crashed')
         finally:
             self.match.end()
-            #import json
-            #print json.dumps(self.match.__json__())
+            import json
+            print json.dumps(self.match.__json__())
             for player in self.players:
                 player._botproxy.terminate()
             return self.match.__json__()
