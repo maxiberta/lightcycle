@@ -47,7 +47,7 @@ class RemoteInstance(object):
                 # Find the first class declared in our custom namespace
                 klass = [var for var in namespace.values() if inspect.isclass(var)][0]
             assert(class_validator(klass))
-            print current_process(), 'Instancing %s' % klass
+            #print current_process(), 'Instancing %s' % klass
             instance = klass()
             for method, args, kwargs in iter(input.get, 'STOP'):
                 #print current_process(), 'Calling %s(...)' % method

@@ -2,9 +2,12 @@
 
 import time
 import numpy
+import logging
 
 from .basebot import DIRECTIONS, LightCycleBaseBot
 from .worker import RemoteInstance
+
+logger = logging.getLogger(__name__)
 
 
 class LightCycleArena(object):
@@ -42,12 +45,13 @@ class LightCycleArena(object):
         occupied = not self.arena[x, y]
         self.arena[player.x, player.y] = player.color
         self.match.log(player, player.x, player.y, direction)
-        print self.arena.T
-        print
+        #print self.arena.T
+        #print
         assert(occupied)
 
     def start(self):
         try:
+            logging.info('Starting match "%s"' % (' vs '.join([player.username for player in self.players])))
             for step in xrange(self.width * self.height):
                 playing = [player for player in self.players
                                     if player.status == self.PLAYING]
@@ -68,18 +72,18 @@ class LightCycleArena(object):
                         y = player.y + DIRECTIONS[movement].y
                         self.move(player, x, y, movement)
                     except RemoteInstance.InvalidOutput:
-                        print 'Invalid output!', player.username, movement
+                        logger.info('Invalid output! %s %s', player.username, movement)
                         self.match.lost(player, u'Invalid output')
                     except RemoteInstance.Timeout:
-                        print 'TIME UP!', player.username
+                        logger.info('TIME UP! %s', player.username)
                         self.match.lost(player, u'Timeout')
                     except:
-                        print 'CRASHED!', player.username, player.x, player.y
+                        logger.info('CRASHED! %s %s %s', player.username, player.x, player.y)
                         self.match.lost(player, u'Crashed')
         finally:
             self.match.end()
-            import json
-            print json.dumps(self.match.__json__())
+            #import json
+            #print json.dumps(self.match.__json__())
             for player in self.players:
                 player._botproxy.terminate()
             return self.match.__json__()
