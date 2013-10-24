@@ -38,6 +38,7 @@ class RemoteInstance(object):
 
     @staticmethod
     def worker(klass, input, output, namespace=None, class_validator=None):
+        try:
             seal() # seal the running environment, EXTERMINATE! EXTERMINATE sys!
             if isinstance(klass, basestring):  # Received a string of code
                 if class_validator is None:
@@ -54,6 +55,10 @@ class RemoteInstance(object):
                 result = getattr(instance, method)(*args, **kwargs)
                 #print current_process(), 'Result:',result
                 output.put(result)
+
+        except Exception as ex:
+            print 'Error running bot (%s)' % str(ex)
+            output.put(ex)
 
     def terminate(self):
         self.proc.terminate()

@@ -8,7 +8,7 @@ blacklisted_modules = ['os',
                        'sqlite',
                        'thread',
                        'threading',
-                       'multiprocessing',
+                       #'multiprocessing',
                        'sqlite3',
                        'urllib',
                        'urllib2',
@@ -17,7 +17,7 @@ blacklisted_modules = ['os',
                        'popen2',
                        'trace',
                        'virtualenv',
-                       'sys'
+                       #'sys'
                        ]
 
 def seal():
