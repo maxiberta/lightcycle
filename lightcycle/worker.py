@@ -59,7 +59,7 @@ class RemoteInstance(object):
             desc = traceback.format_exc()
             desc = '\n'.join([line for line in desc.split('\n') if '/home' not in line and '/var' not in line])
             print 'Error running bot (%s)' % str(desc)
-            output.put(desc)
+            output.put(Exception(desc))
             raise
 
     def terminate(self):
