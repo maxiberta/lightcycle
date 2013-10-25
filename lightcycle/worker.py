@@ -4,6 +4,7 @@ from lightcycle.security import seal
 from multiprocessing import Process, Queue, current_process
 from Queue import Empty
 import inspect
+import traceback
 
 
 class RemoteInstance(object):
@@ -54,10 +55,11 @@ class RemoteInstance(object):
                 result = getattr(instance, method)(*args, **kwargs)
                 #print current_process(), 'Result:',result
                 output.put(result)
-
         except Exception as ex:
-            print 'Error running bot (%s)' % str(ex)
-            output.put(ex)
+            desc = traceback.format_exc()
+            desc = '\n'.join([line for line in desc.split('\n') if '/home' not in line and '/var' not in line])
+            print 'Error running bot (%s)' % str(desc)
+            output.put(desc)
             raise
 
     def terminate(self):
