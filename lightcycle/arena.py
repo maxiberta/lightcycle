@@ -30,7 +30,7 @@ class LightCycleArena(object):
             player.status = self.PLAYING
             player._botproxy = RemoteInstance(player.bot, timeout=.02,
                     namespace={'LightCycleBaseBot':LightCycleBaseBot},
-                    validator=lambda x: issubclass(x, LightCycleBaseBot)
+                    validator=lambda x: issubclass(x, LightCycleBaseBot) and x is not LightCycleBaseBot,
                     )
             x = self.width * i / (len(self.players) + 1)
             y = self.height * i / (len(self.players) + 1)

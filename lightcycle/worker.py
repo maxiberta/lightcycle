@@ -46,8 +46,7 @@ class RemoteInstance(object):
                 namespace = namespace or {}
                 exec klass in namespace
                 # Find the first class declared in our custom namespace
-                klass = [var for var in namespace.values() if inspect.isclass(var)][0]
-            assert(class_validator(klass))
+                klass = [var for var in namespace.values() if inspect.isclass(var) and class_validator(var)][0]
             #print current_process(), 'Instancing %s' % klass
             instance = klass()
             for method, args, kwargs in iter(input.get, 'STOP'):
@@ -59,6 +58,7 @@ class RemoteInstance(object):
         except Exception as ex:
             print 'Error running bot (%s)' % str(ex)
             output.put(ex)
+            raise
 
     def terminate(self):
         self.proc.terminate()
