@@ -3,6 +3,7 @@ lightcycle
 
 A simple AI lightcycle game engine.
 
+Check a Django frontend at https://github.com/pguridi/djlightcycle
 
 Setup
 -----
